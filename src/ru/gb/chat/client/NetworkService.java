@@ -16,30 +16,69 @@ public class NetworkService {
     private DataInputStream in;
     private DataOutputStream out;
 
+    private boolean connected;
+
     public NetworkService() {
         try {
             socket = new Socket(IP_ADDRESS, PORT);
             out = new DataOutputStream(socket.getOutputStream());
             in = new DataInputStream(socket.getInputStream());
-        } catch (IOException e) {
+            connected = true;
+        } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
 
     public void sendMessage(String message) {
         try {
             out.writeUTF(message);
-        } catch (IOException e) {
+           } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     public String getMessage() {
+
         try {
-            return in.readUTF();
+            String msg = in.readUTF();
+            if (msg.equals("/end")) {
+                disconnect();
+            }
+            return msg;
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return "";
+    }
+
+    public void disconnect() {
+
+        try {
+            in.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return "";
+        try {
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        connected = false;
+
+        System.out.println("Клиент отключился от сервера");
+
+    }
+
+    public boolean isConnected() {
+        return connected;
     }
 }

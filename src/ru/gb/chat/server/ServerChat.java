@@ -34,4 +34,10 @@ public class ServerChat {
             client.sendMessage(msg);
         }
     }
+
+    public void removeClient(ClientHandler client) {
+        client.sendMessage("/end");
+        clients.remove(client);
+    }
+
 }
