@@ -35,12 +35,13 @@ public class Controller implements Initializable {
         textField.requestFocus();
     }
 
-
-
     private String validate() {
         String textFromField = textField.getText();
         String warning = null;
-        if (textFromField.isEmpty()) {
+        if (!networkService.isConnected()) {
+            warning = "Клиент не подключен к серверу";
+        }
+        else if (textFromField.isEmpty()) {
             warning = "Нельзя отправлять пустое сообщение";
         } else {
             Integer count = uniqCheckMap.getOrDefault(textFromField, 0);
@@ -55,12 +56,20 @@ public class Controller implements Initializable {
         return warning;
     }
 
+    public void disconnect()  {
+        textField.setText("/end");
+        sendMsg();
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
         new Thread(() -> {
-            while (true) {
-                textArea.appendText(networkService.getMessage() + "\n");
+            while (networkService.isConnected()) {
+               textArea.appendText(networkService.getMessage() + "\n");
             }
         }).start();
+
+
     }
 }

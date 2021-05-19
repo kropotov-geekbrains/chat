@@ -1,6 +1,5 @@
 package ru.gb.chat.server;
 
-import ru.gb.chat.client.ClientChat;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -65,20 +64,25 @@ public class ClientHandler {
     }
 
     public void disconnect() {
-        try {
-            socket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+        serverChat.removeClient(this);
+
         try {
             in.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
         try {
-            out.close();
+           out.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        try {
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }
