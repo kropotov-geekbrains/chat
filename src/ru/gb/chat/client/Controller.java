@@ -31,11 +31,8 @@ public class Controller implements Initializable {
         } else {
             new Alert(Alert.AlertType.WARNING, warning, ButtonType.OK).showAndWait();
         }
-
         textField.requestFocus();
     }
-
-
 
     private String validate() {
         String textFromField = textField.getText();
@@ -55,11 +52,16 @@ public class Controller implements Initializable {
         return warning;
     }
 
+    public void exitAction()  {
+        textField.setText("/end");
+        sendMsg();
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         new Thread(() -> {
-            while (true) {
-                textArea.appendText(networkService.getMessage() + "\n");
+            while (networkService.isConnected()) {
+               textArea.appendText(networkService.getMessage() + "\n");
             }
         }).start();
     }
