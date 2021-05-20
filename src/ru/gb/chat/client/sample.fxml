@@ -11,7 +11,8 @@
     <TextArea fx:id="textArea" editable="false" VBox.vgrow="ALWAYS" />
     <HBox spacing="5.0">
         <TextField fx:id="textField" onAction="#sendMsg" promptText="Введите сообщение..." HBox.hgrow="ALWAYS" />
-        <Button fx:id="send" onAction="#sendMsg" text="Send" />
+        <Button fx:id="send" onAction="#sendMsg" style="-fx-background-color: green;" text="Send" />
+        <Button fx:id="close" onAction="#closeApp" style="-fx-background-color: red;" text="Exit" />
         <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
         </padding>
