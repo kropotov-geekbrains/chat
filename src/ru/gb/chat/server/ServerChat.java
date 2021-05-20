@@ -34,4 +34,9 @@ public class ServerChat {
             client.sendMessage(msg);
         }
     }
+
+    public void userDisconnect(ClientHandler client) {
+        clients.remove(client);
+        client.sendMessage("/end");
+    }
 }

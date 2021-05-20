@@ -15,13 +15,19 @@ public class NetworkService {
     private Socket socket;
     private DataInputStream in;
     private DataOutputStream out;
+    private boolean connected;
+
+    public boolean isConnected() {
+        return connected;
+    }
 
     public NetworkService() {
         try {
             socket = new Socket(IP_ADDRESS, PORT);
             out = new DataOutputStream(socket.getOutputStream());
             in = new DataInputStream(socket.getInputStream());
-        } catch (IOException e) {
+            connected = true;
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -36,10 +42,33 @@ public class NetworkService {
 
     public String getMessage() {
         try {
+            if (in.readUTF().equals("/end")) {
+                disconnect();
+            }
             return in.readUTF();
         } catch (IOException e) {
             e.printStackTrace();
         }
         return "";
+    }
+
+    public void disconnect() {
+        try {
+            in.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        connected = false;
+        System.exit(0);
     }
 }

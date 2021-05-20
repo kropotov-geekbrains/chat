@@ -1,6 +1,5 @@
 package ru.gb.chat.server;
 
-import ru.gb.chat.client.ClientChat;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -65,6 +64,9 @@ public class ClientHandler {
     }
 
     public void disconnect() {
+
+        serverChat.userDisconnect(this);
+
         try {
             socket.close();
         } catch (IOException e) {
@@ -75,10 +77,12 @@ public class ClientHandler {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         try {
             out.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
 }
