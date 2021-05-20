@@ -21,7 +21,14 @@ public class Controller implements Initializable {
     @FXML
     TextField textField;
 
+    private boolean isWork = true;
+
     private final NetworkService networkService = new NetworkService();
+
+    public void closeApp() {
+        isWork = false;
+        networkService.sendMessage("/end");
+    }
 
     public void sendMsg(){
         String warning = validate();
@@ -58,7 +65,7 @@ public class Controller implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         new Thread(() -> {
-            while (true) {
+            while (isWork) {
                 textArea.appendText(networkService.getMessage() + "\n");
             }
         }).start();
