@@ -22,6 +22,12 @@ public class ServerChat {
                 Socket socket = serverSocket.accept();
                 System.out.println("Клиент подключился");
                 clients.add(new ClientHandler(socket, this));
+
+                for (int i = 0; i < clients.size(); i++) {
+                    if (clients.get(i).getSocket().isClosed()) {
+                        clients.remove(i);
+                    }
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();

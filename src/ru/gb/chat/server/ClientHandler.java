@@ -47,6 +47,10 @@ public class ClientHandler {
         }
     }
 
+    public Socket getSocket() {
+        return this.socket;
+    }
+
     public void sendMessage(String message) {
         try {
             out.writeUTF(message);

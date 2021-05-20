@@ -28,6 +28,7 @@ public class Controller implements Initializable {
     public void closeApp() {
         isWork = false;
         networkService.sendMessage("/end");
+        System.exit(0);
     }
 
     public void sendMsg(){
