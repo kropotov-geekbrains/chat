@@ -2,10 +2,8 @@ package ru.gb.chat.client;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 
 import java.net.URL;
 import java.util.HashMap;
@@ -21,12 +19,25 @@ public class Controller implements Initializable {
     @FXML
     TextField textField;
 
-    private final NetworkService networkService = new NetworkService();
+    @FXML
+    TextField loginField;
+
+    @FXML
+    PasswordField passField;
+
+    @FXML
+    HBox authPanel, msgPanel;
+
+    @FXML
+    ListView<String> clientsList;
+
+    private String nickname;
+    private boolean authenticated;
 
     public void sendMsg(){
         String warning = validate();
         if (warning == null) {
-            networkService.sendMessage(textField.getText());
+            NetworkService.sendMessage(textField.getText());
             textField.clear();
         } else {
             new Alert(Alert.AlertType.WARNING, warning, ButtonType.OK).showAndWait();
@@ -57,10 +68,61 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        new Thread(() -> {
-            while (true) {
-                textArea.appendText(networkService.getMessage() + "\n");
+        setAuthenticated(false);
+        clientsList.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                String selectedNickname = clientsList.getSelectionModel().getSelectedItem();
+                textField.setText("/w " + selectedNickname + " ");
+                textField.requestFocus();
+                textField.selectEnd();
             }
-        }).start();
+        });
+        setCallbacks();
+    }
+
+    public void sendAuth() {
+        NetworkService.sendAuth(loginField.getText(), passField.getText());
+        loginField.clear();
+        passField.clear();
+    }
+
+    public void setAuthenticated(boolean authenticated) {
+        this.authenticated = authenticated;
+        authPanel.setVisible(!authenticated);
+        authPanel.setManaged(!authenticated);
+        msgPanel.setVisible(authenticated);
+        msgPanel.setManaged(authenticated);
+        clientsList.setVisible(authenticated);
+        clientsList.setManaged(authenticated);
+        if (!authenticated) {
+            nickname = "";
+        }
+
+    }
+
+    public void setCallbacks() {
+        NetworkService.setCallOnException(args -> new Alert(Alert.AlertType.WARNING, String.valueOf(args[0]), ButtonType.OK).showAndWait());
+
+        NetworkService.setCallOnAuthenticated(args -> {
+            nickname = String.valueOf(args[0]);
+            setAuthenticated(true);
+        });
+
+        NetworkService.setCallOnMsgReceived(args -> {
+            String msg = String.valueOf(args[0]);
+            if (msg.startsWith("/")) {
+                if (msg.startsWith("/clients")) {
+                    String[] nicknames = msg.split("\\s");
+                    clientsList.getItems().clear();
+                    for (int i = 1; i < nicknames.length; i++) {
+                        clientsList.getItems().add(nicknames[i]);
+                    }
+                }
+            } else {
+                textArea.appendText(msg + "\n");
+            }
+        });
+
+        NetworkService.setCallOnDisconnect(args -> setAuthenticated(false));
     }
 }
