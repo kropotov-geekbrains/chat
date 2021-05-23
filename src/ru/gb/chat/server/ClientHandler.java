@@ -28,9 +28,6 @@ public class ClientHandler {
                 try {
                     while (true) {
                         String str = in.readUTF();
-                        if (str.equals("/end")) {
-                            break;
-                        }
                         System.out.println("Client sent: " + str);
                         serverChat.broadcastMsg(str);
                     }

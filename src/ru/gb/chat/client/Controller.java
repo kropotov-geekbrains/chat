@@ -30,6 +30,7 @@ public class Controller implements Initializable {
             textField.clear();
         } else {
             new Alert(Alert.AlertType.WARNING, warning, ButtonType.OK).showAndWait();
+            textField.clear();
         }
 
         textField.requestFocus();
@@ -40,7 +41,7 @@ public class Controller implements Initializable {
     private String validate() {
         String textFromField = textField.getText();
         String warning = null;
-        if (textFromField.isEmpty()) {
+        if (textFromField.trim().length() == 0) {
             warning = "Нельзя отправлять пустое сообщение";
         } else {
             Integer count = uniqCheckMap.getOrDefault(textFromField, 0);
@@ -57,10 +58,12 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        new Thread(() -> {
+        Thread clientThread = new Thread(() -> {
             while (true) {
                 textArea.appendText(networkService.getMessage() + "\n");
             }
-        }).start();
+        });
+        clientThread.setDaemon(true);
+        clientThread.start();
     }
 }
