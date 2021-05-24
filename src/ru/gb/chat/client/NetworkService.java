@@ -1,6 +1,7 @@
 package ru.gb.chat.client;
 
-import javax.naming.ldap.Control;
+import javafx.application.Platform;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -66,15 +67,6 @@ public class NetworkService {
         }
     }
 
-    public static String getMessage() {
-        try {
-            return in.readUTF();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return "";
-    }
-
     public static void connect() {
         try {
             socket = new Socket(IP_ADDRESS, PORT);
@@ -129,5 +121,12 @@ public class NetworkService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void close() {
+        Platform.runLater( () -> {
+            Platform.exit();
+            sendMessage("/end");
+        });
     }
 }

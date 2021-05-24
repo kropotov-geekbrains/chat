@@ -16,6 +16,8 @@ public class ClientHandler {
     private DataOutputStream out;
     private DataInputStream in;
     private ServerChat serverChat;
+    private AuthService authService = ListAuthService.getInstance();
+    private User user;
 
     public ClientHandler(Socket socket, ServerChat serverChat) {
         try {
@@ -27,12 +29,33 @@ public class ClientHandler {
             new Thread(() -> {
                 try {
                     while (true) {
-                        String str = in.readUTF();
-                        if (str.equals("/end")) {
-                            break;
+                        String msg = in.readUTF();
+                        if (msg.startsWith("/auth ")) {
+                            String[] token = msg.split("\\s");
+                            User user = authService.findByLoginAndPassword(token[1], token[2]);
+                            if (user != null && !serverChat.isNickBusy(user.getNickname())) {
+                                sendMessage("/authok " + user.getNickname());
+                                this.user = user;
+                                serverChat.subscribe(this);
+                                break;
+                            }
                         }
-                        System.out.println("Client sent: " + str);
-                        serverChat.broadcastMsg(str);
+                    }
+                    while (true) {
+                        String msg = in.readUTF();
+                        if (msg.startsWith("/")) {
+                            if (msg.equals("/end")) {
+                                sendMessage("/end");
+                                break;
+                            }
+                            if (msg.startsWith("/w")) {
+                                String[] token = msg.split("\\s", 3);
+                                serverChat.privateMsg(this, token[1], token[2]);
+
+                            }
+                        } else {
+                            serverChat.broadcastMsg(user.getNickname() + ": " + msg);
+                        }
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -55,16 +78,8 @@ public class ClientHandler {
         }
     }
 
-    public String getMessage() {
-        try {
-            return in.readUTF();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return "";
-    }
-
     public void disconnect() {
+        serverChat.unsubscribe(this);
         try {
             socket.close();
         } catch (IOException e) {
@@ -80,5 +95,9 @@ public class ClientHandler {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public User getUser() {
+        return user;
     }
 }

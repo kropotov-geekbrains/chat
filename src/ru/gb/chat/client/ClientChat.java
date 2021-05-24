@@ -14,6 +14,9 @@ public class ClientChat extends Application {
         primaryStage.setTitle("Chat");
         primaryStage.setScene(new Scene(root, 400, 275));
         primaryStage.show();
+        primaryStage.setOnCloseRequest(event -> {
+            NetworkService.close();
+        });
     }
 
 

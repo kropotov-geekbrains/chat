@@ -1,5 +1,6 @@
 package ru.gb.chat.client;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -113,10 +114,12 @@ public class Controller implements Initializable {
             if (msg.startsWith("/")) {
                 if (msg.startsWith("/clients")) {
                     String[] nicknames = msg.split("\\s");
-                    clientsList.getItems().clear();
-                    for (int i = 1; i < nicknames.length; i++) {
-                        clientsList.getItems().add(nicknames[i]);
-                    }
+                    Platform.runLater(() -> {
+                        clientsList.getItems().clear();
+                        for (int i = 1; i < nicknames.length; i++) {
+                            clientsList.getItems().add(nicknames[i]);
+                        }
+                    });
                 }
             } else {
                 textArea.appendText(msg + "\n");
