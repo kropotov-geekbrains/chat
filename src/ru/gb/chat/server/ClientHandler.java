@@ -1,6 +1,6 @@
 package ru.gb.chat.server;
 
-import ru.gb.chat.client.ClientChat;
+import ru.gb.chat.client.NetworkService;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -24,7 +24,7 @@ public class ClientHandler {
             this.in = new DataInputStream(socket.getInputStream());
             this.serverChat = serverChat;
 
-            new Thread(() -> {
+           new Thread(() -> {
                 try {
                     while (true) {
                         String str = in.readUTF();
@@ -37,8 +37,11 @@ public class ClientHandler {
                 } catch (IOException e) {
                     e.printStackTrace();
                 } finally {
+                    serverChat.clientOff(this);
                     System.out.println("Клиент отключился");
                     disconnect();
+
+
                 }
             }).start();
         } catch (IOException e) {

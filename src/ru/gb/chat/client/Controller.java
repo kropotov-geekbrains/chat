@@ -57,10 +57,16 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        new Thread(() -> {
+
+        Thread thread = new Thread(() -> {
             while (true) {
                 textArea.appendText(networkService.getMessage() + "\n");
-            }
-        }).start();
+        }
+        });
+        thread.setDaemon(true);
+        thread.start();
+
+
+
     }
 }

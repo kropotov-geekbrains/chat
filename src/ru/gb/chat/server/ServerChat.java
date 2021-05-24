@@ -1,6 +1,8 @@
 package ru.gb.chat.server;
 
-import java.io.*;
+import com.sun.javafx.geom.AreaOp;
+
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -28,6 +30,18 @@ public class ServerChat {
         }
         System.out.println();
     }
+
+
+
+  public void clientOff(ClientHandler client) {
+        System.out.println("Список клиентов " + clients + ". отключаемый клиент " + client);
+            clients.remove(client);
+      System.out.println("Список клиентов " + clients);
+
+
+
+  }
+
 
     public void broadcastMsg(String msg) {
         for (ClientHandler client : clients) {
