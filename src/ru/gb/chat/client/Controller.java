@@ -34,18 +34,18 @@ public class Controller implements Initializable {
     private String nickname;
     private boolean authenticated;
 
-    public void sendMsg(){
+    public void sendMsg() {
         String warning = validate();
         if (warning == null) {
             NetworkService.sendMessage(textField.getText());
             textField.clear();
         } else {
             new Alert(Alert.AlertType.WARNING, warning, ButtonType.OK).showAndWait();
+            textField.clear();
         }
 
         textField.requestFocus();
     }
-
 
 
     private String validate() {
@@ -78,6 +78,13 @@ public class Controller implements Initializable {
             }
         });
         setCallbacks();
+        Thread thread = new Thread(() -> {
+            while (true) {
+                textArea.appendText(NetworkService.getMessage() + "\n");
+            }
+        });
+        thread.setDaemon(true);
+        thread.start();
     }
 
     public void sendAuth() {

@@ -16,7 +16,7 @@ public class ServerChat {
     }
 
     public void start() {
-        try(ServerSocket serverSocket = new ServerSocket(8189)) {
+        try (ServerSocket serverSocket = new ServerSocket(8189)) {
             System.out.println("Сервер запущен");
             while (true) {
                 Socket socket = serverSocket.accept();
@@ -33,5 +33,10 @@ public class ServerChat {
         for (ClientHandler client : clients) {
             client.sendMessage(msg);
         }
+    }
+
+    public void disableClient(ClientHandler client) {
+        System.out.println(client + " вышел из сети");
+        clients.remove(client);
     }
 }

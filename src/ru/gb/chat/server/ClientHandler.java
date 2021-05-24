@@ -1,7 +1,5 @@
 package ru.gb.chat.server;
 
-import ru.gb.chat.client.ClientChat;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -37,6 +35,7 @@ public class ClientHandler {
                 } catch (IOException e) {
                     e.printStackTrace();
                 } finally {
+                    serverChat.disableClient(this);
                     System.out.println("Клиент отключился");
                     disconnect();
                 }
