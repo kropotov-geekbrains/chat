@@ -1,61 +1,35 @@
-package ru.gb.chat.server;
+package server;
 
-import ru.gb.chat.client.ClientChat;
+import client.NetworkService;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
-/**
- * Created by Artem Kropotov on 17.05.2021
- */
 public class ClientHandler {
 
     private Socket socket;
-    private DataOutputStream out;
     private DataInputStream in;
-    private ServerChat serverChat;
-    private AuthService authService = ListAuthService.getInstance();
-    private User user;
+    private DataOutputStream out;
 
-    public ClientHandler(Socket socket, ServerChat serverChat) {
+    public ClientHandler(Socket socket, ServerChat serverChat){
         try {
             this.socket = socket;
-            this.out = new DataOutputStream(socket.getOutputStream());
             this.in = new DataInputStream(socket.getInputStream());
-            this.serverChat = serverChat;
+            this.out = new DataOutputStream(socket.getOutputStream());
 
             new Thread(() -> {
                 try {
-                    while (true) {
-                        String msg = in.readUTF();
-                        if (msg.startsWith("/auth ")) {
-                            String[] token = msg.split("\\s");
-                            User user = authService.findByLoginAndPassword(token[1], token[2]);
-                            if (user != null && !serverChat.isNickBusy(user.getNickname())) {
-                                sendMessage("/authok " + user.getNickname());
-                                this.user = user;
-                                serverChat.subscribe(this);
-                                break;
-                            }
+                    while(true){
+                        String str = in.readUTF();
+                        if(str.equals("/end")){
+                            serverChat.disconnectClient(this);
+                            break;
                         }
-                    }
-                    while (true) {
-                        String msg = in.readUTF();
-                        if (msg.startsWith("/")) {
-                            if (msg.equals("/end")) {
-                                sendMessage("/end");
-                                break;
-                            }
-                            if (msg.startsWith("/w")) {
-                                String[] token = msg.split("\\s", 3);
-                                serverChat.privateMsg(this, token[1], token[2]);
+                        System.out.println("Client send: " + str);
 
-                            }
-                        } else {
-                            serverChat.broadcastMsg(user.getNickname() + ": " + msg);
-                        }
+                        serverChat.broadcastMsg(str);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -70,16 +44,7 @@ public class ClientHandler {
         }
     }
 
-    public void sendMessage(String message) {
-        try {
-            out.writeUTF(message);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void disconnect() {
-        serverChat.unsubscribe(this);
+    public void disconnect(){
         try {
             socket.close();
         } catch (IOException e) {
@@ -97,7 +62,21 @@ public class ClientHandler {
         }
     }
 
-    public User getUser() {
-        return user;
+    public void sendMessage(String message){
+        try {
+            out.writeUTF(message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
+    public String getMassage(){
+        try {
+            return in.readUTF();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
 }

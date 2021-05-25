@@ -1,131 +1,65 @@
-package ru.gb.chat.client;
+package client;
 
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.stage.StageStyle;
 
+import java.io.EOFException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
 
-    private final Map<String, Integer> uniqCheckMap = new HashMap<>();
+    private int msgCount = 0;
+    private String newMsg;
+
+    private boolean isConnected = true;
 
     @FXML
     TextArea textArea;
+
     @FXML
     TextField textField;
 
-    @FXML
-    TextField loginField;
 
-    @FXML
-    PasswordField passField;
-
-    @FXML
-    HBox authPanel, msgPanel;
-
-    @FXML
-    ListView<String> clientsList;
-
-    private String nickname;
-    private boolean authenticated;
+    private NetworkService networkService = new NetworkService();
 
     public void sendMsg(){
-        String warning = validate();
-        if (warning == null) {
-            NetworkService.sendMessage(textField.getText());
-            textField.clear();
-        } else {
-            new Alert(Alert.AlertType.WARNING, warning, ButtonType.OK).showAndWait();
-        }
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Warning");
+        alert.setHeaderText(null);
+        alert.initStyle(StageStyle.UTILITY);
 
+        String msg = newMsg;
+        newMsg = textField.getText();
+        if (newMsg.equals(msg)){
+            msgCount++;
+        } else msgCount = 0;
+
+        if(textField.getText().equals("")){
+            alert.setContentText("Пустое сообщение");
+            alert.showAndWait();
+        } else if(msgCount > 2){
+            alert.setContentText("Сообщение отправлена более 3-х раз подряд");
+            alert.showAndWait();
+        } else networkService.sendMessage(textField.getText());
+
+        textField.clear();
         textField.requestFocus();
-    }
-
-
-
-    private String validate() {
-        String textFromField = textField.getText();
-        String warning = null;
-        if (textFromField.isEmpty()) {
-            warning = "Нельзя отправлять пустое сообщение";
-        } else {
-            Integer count = uniqCheckMap.getOrDefault(textFromField, 0);
-            if (count.equals(0)) {
-                uniqCheckMap.clear();
-            }
-            uniqCheckMap.put(textFromField, ++count);
-            if (count > 3) {
-                warning = "Нельзя отправлять больше 3 одинаковых сообщений подряд. № вашей попытки: " + count;
-            }
-        }
-        return warning;
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        setAuthenticated(false);
-        clientsList.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2) {
-                String selectedNickname = clientsList.getSelectionModel().getSelectedItem();
-                textField.setText("/w " + selectedNickname + " ");
-                textField.requestFocus();
-                textField.selectEnd();
+        new Thread(() -> {
+            while (networkService.isConnected){
+                textArea.appendText(networkService.getMassage() + "\n");
             }
-        });
-        setCallbacks();
-    }
-
-    public void sendAuth() {
-        NetworkService.sendAuth(loginField.getText(), passField.getText());
-        loginField.clear();
-        passField.clear();
-    }
-
-    public void setAuthenticated(boolean authenticated) {
-        this.authenticated = authenticated;
-        authPanel.setVisible(!authenticated);
-        authPanel.setManaged(!authenticated);
-        msgPanel.setVisible(authenticated);
-        msgPanel.setManaged(authenticated);
-        clientsList.setVisible(authenticated);
-        clientsList.setManaged(authenticated);
-        if (!authenticated) {
-            nickname = "";
-        }
-
-    }
-
-    public void setCallbacks() {
-        NetworkService.setCallOnException(args -> new Alert(Alert.AlertType.WARNING, String.valueOf(args[0]), ButtonType.OK).showAndWait());
-
-        NetworkService.setCallOnAuthenticated(args -> {
-            nickname = String.valueOf(args[0]);
-            setAuthenticated(true);
-        });
-
-        NetworkService.setCallOnMsgReceived(args -> {
-            String msg = String.valueOf(args[0]);
-            if (msg.startsWith("/")) {
-                if (msg.startsWith("/clients")) {
-                    String[] nicknames = msg.split("\\s");
-                    Platform.runLater(() -> {
-                        clientsList.getItems().clear();
-                        for (int i = 1; i < nicknames.length; i++) {
-                            clientsList.getItems().add(nicknames[i]);
-                        }
-                    });
-                }
-            } else {
-                textArea.appendText(msg + "\n");
-            }
-        });
-
-        NetworkService.setCallOnDisconnect(args -> setAuthenticated(false));
+            textArea.appendText("Клиент отключен");
+            //textField.setVisible(false);
+        }).start();
     }
 }
