@@ -4,7 +4,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.CopyOnWriteArrayList;
-
+//Продолжаем изучение...
 public class ServerChat {
     private final CopyOnWriteArrayList<ClientHandler> clients = new CopyOnWriteArrayList<>();
     

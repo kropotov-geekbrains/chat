@@ -1,8 +1,5 @@
 package ru.gb.chat.server;
-
-/**
- * Created by Artem Kropotov on 24.05.2021
- */
+//Продолжаем изучение...
 public class User {
     private final String login;
     private final String password;

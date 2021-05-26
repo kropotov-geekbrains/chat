@@ -6,7 +6,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-
+//Продолжаем изучение...
 public class NetworkService {
     private static final String IP_ADDRESS = "localhost";
     private static final int PORT = 8189;

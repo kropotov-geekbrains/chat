@@ -1,5 +1,5 @@
 package ru.gb.chat.server;
-
+//Продолжаем изучение...
 import ru.gb.chat.client.ClientChat;
 
 import java.io.DataInputStream;
@@ -7,9 +7,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
-/**
- * Created by Artem Kropotov on 17.05.2021
- */
 public class ClientHandler {
 
     private Socket socket;

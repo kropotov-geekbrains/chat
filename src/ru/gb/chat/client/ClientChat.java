@@ -1,11 +1,10 @@
 package ru.gb.chat.client;
-
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-
+//Продолжаем изучение...
 public class ClientChat extends Application {
     
     @Override

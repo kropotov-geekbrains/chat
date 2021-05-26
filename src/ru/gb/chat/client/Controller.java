@@ -10,7 +10,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
-
+//Продолжаем изучение...
 public class Controller implements Initializable {
     
     private final Map<String, Integer> uniqCheckMap = new HashMap<>();

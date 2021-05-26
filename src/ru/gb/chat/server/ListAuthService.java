@@ -3,9 +3,6 @@ package ru.gb.chat.server;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-/**
- * Created by Artem Kropotov on 24.05.2021
- */
 public class ListAuthService implements AuthService, CrudService<User, Long> {
 
     private static ListAuthService INSTANCE;
