@@ -5,18 +5,15 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-/**
- * Created by Artem Kropotov on 17.05.2021
- */
 public class ServerChat {
     private final CopyOnWriteArrayList<ClientHandler> clients = new CopyOnWriteArrayList<>();
-
+    
     public static void main(String[] args) {
         new ServerChat().start();
     }
-
+    
     public void start() {
-        try(ServerSocket serverSocket = new ServerSocket(8189)) {
+        try (ServerSocket serverSocket = new ServerSocket(8189)) {
             System.out.println("Сервер запущен");
             while (true) {
                 Socket socket = serverSocket.accept();
@@ -28,23 +25,23 @@ public class ServerChat {
         }
         System.out.println();
     }
-
+    
     public void broadcastMsg(String msg) {
         for (ClientHandler client : clients) {
             client.sendMessage(msg);
         }
     }
-
+    
     public void subscribe(ClientHandler client) {
         clients.add(client);
         broadcastClientList();
     }
-
+    
     public void unsubscribe(ClientHandler clientHandler) {
         clients.remove(clientHandler);
         broadcastClientList();
     }
-
+    
     public boolean isNickBusy(String nickname) {
         for (ClientHandler c : clients) {
             if (c != null) {
@@ -55,12 +52,12 @@ public class ServerChat {
         }
         return false;
     }
-
+    
     public void privateMsg(ClientHandler sender, String nick, String message) {
         if (sender.getUser().getNickname().equals(nick)) {
             sender.sendMessage("Заметка для себя: " + message);
         }
-
+        
         for (ClientHandler receiver : clients) {
             if (receiver.getUser().getNickname().equals(nick)) {
                 receiver.sendMessage("от " + sender.getUser().getNickname() + ": " + message);
@@ -70,7 +67,7 @@ public class ServerChat {
         }
         sender.sendMessage("Клиент " + nick + " не найден");
     }
-
+    
     public void broadcastClientList() {
         StringBuilder stringBuilder = new StringBuilder(9 + 15 * clients.size());
         stringBuilder.append("/clients ");

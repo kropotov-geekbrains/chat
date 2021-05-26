@@ -7,47 +7,44 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
-/**
- * Created by Artem Kropotov on 17.05.2021
- */
 public class NetworkService {
     private static final String IP_ADDRESS = "localhost";
     private static final int PORT = 8189;
-
+    
     private static Socket socket;
     private static DataInputStream in;
     private static DataOutputStream out;
-
-
+    
     private static Callback callOnException;
     private static Callback callOnMsgReceived;
     private static Callback callOnAuthenticated;
     private static Callback callOnDisconnect;
-
+    
     static {
-        Callback callback = (args) -> {};
+        Callback callback = (args) -> {
+        };
         callOnException = callback;
         callOnMsgReceived = callback;
         callOnAuthenticated = callback;
         callOnDisconnect = callback;
     }
-
+    
     public static void setCallOnException(Callback callOnException) {
         NetworkService.callOnException = callOnException;
     }
-
+    
     public static void setCallOnMsgReceived(Callback callOnMsgReceived) {
         NetworkService.callOnMsgReceived = callOnMsgReceived;
     }
-
+    
     public static void setCallOnAuthenticated(Callback callOnAuthenticated) {
         NetworkService.callOnAuthenticated = callOnAuthenticated;
     }
-
+    
     public static void setCallOnDisconnect(Callback callOnDisconnect) {
         NetworkService.callOnDisconnect = callOnDisconnect;
     }
-
+    
     public static void sendAuth(String login, String password) {
         try {
             if (socket == null || socket.isClosed()) {
@@ -58,7 +55,7 @@ public class NetworkService {
             e.printStackTrace();
         }
     }
-
+    
     public static void sendMessage(String message) {
         try {
             out.writeUTF(message);
@@ -66,7 +63,7 @@ public class NetworkService {
             e.printStackTrace();
         }
     }
-
+    
     public static void connect() {
         try {
             socket = new Socket(IP_ADDRESS, PORT);
@@ -90,7 +87,7 @@ public class NetworkService {
                         }
                         callOnMsgReceived.callback(msg);
                     }
-                } catch(IOException e) {
+                } catch (IOException e) {
                     callOnException.callback("Соединение с сервером разорвано");
                     e.printStackTrace();
                 } finally {
@@ -103,7 +100,7 @@ public class NetworkService {
             e.printStackTrace();
         }
     }
-
+    
     public static void disconnect() {
         callOnDisconnect.callback();
         try {
@@ -122,9 +119,9 @@ public class NetworkService {
             e.printStackTrace();
         }
     }
-
+    
     public static void close() {
-        Platform.runLater( () -> {
+        Platform.runLater(() -> {
             Platform.exit();
             sendMessage("/end");
         });

@@ -12,30 +12,30 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
-
+    
     private final Map<String, Integer> uniqCheckMap = new HashMap<>();
-
+    
     @FXML
     TextArea textArea;
     @FXML
     TextField textField;
-
+    
     @FXML
     TextField loginField;
-
+    
     @FXML
     PasswordField passField;
-
+    
     @FXML
     HBox authPanel, msgPanel;
-
+    
     @FXML
     ListView<String> clientsList;
-
+    
     private String nickname;
     private boolean authenticated;
-
-    public void sendMsg(){
+    
+    public void sendMsg() {
         String warning = validate();
         if (warning == null) {
             NetworkService.sendMessage(textField.getText());
@@ -43,12 +43,11 @@ public class Controller implements Initializable {
         } else {
             new Alert(Alert.AlertType.WARNING, warning, ButtonType.OK).showAndWait();
         }
-
+        
         textField.requestFocus();
     }
-
-
-
+    
+    
     private String validate() {
         String textFromField = textField.getText();
         String warning = null;
@@ -66,7 +65,7 @@ public class Controller implements Initializable {
         }
         return warning;
     }
-
+    
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setAuthenticated(false);
@@ -80,13 +79,13 @@ public class Controller implements Initializable {
         });
         setCallbacks();
     }
-
+    
     public void sendAuth() {
         NetworkService.sendAuth(loginField.getText(), passField.getText());
         loginField.clear();
         passField.clear();
     }
-
+    
     public void setAuthenticated(boolean authenticated) {
         this.authenticated = authenticated;
         authPanel.setVisible(!authenticated);
@@ -98,17 +97,17 @@ public class Controller implements Initializable {
         if (!authenticated) {
             nickname = "";
         }
-
+        
     }
-
+    
     public void setCallbacks() {
         NetworkService.setCallOnException(args -> new Alert(Alert.AlertType.WARNING, String.valueOf(args[0]), ButtonType.OK).showAndWait());
-
+        
         NetworkService.setCallOnAuthenticated(args -> {
             nickname = String.valueOf(args[0]);
             setAuthenticated(true);
         });
-
+        
         NetworkService.setCallOnMsgReceived(args -> {
             String msg = String.valueOf(args[0]);
             if (msg.startsWith("/")) {
@@ -125,7 +124,6 @@ public class Controller implements Initializable {
                 textArea.appendText(msg + "\n");
             }
         });
-
         NetworkService.setCallOnDisconnect(args -> setAuthenticated(false));
     }
 }
