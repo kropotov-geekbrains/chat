@@ -126,7 +126,7 @@ public class NetworkService {
     public static void close() {
         Platform.runLater( () -> {
             Platform.exit();
-            sendMessage("/end");
+//            sendMessage("/end");
         });
     }
 }

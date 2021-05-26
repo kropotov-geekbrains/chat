@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 
 import java.net.URL;
 import java.util.HashMap;
@@ -27,7 +28,10 @@ public class Controller implements Initializable {
     PasswordField passField;
 
     @FXML
-    HBox authPanel, msgPanel;
+    HBox msgPanel;
+
+    @FXML
+    VBox authPanel;
 
     @FXML
     ListView<String> clientsList;
@@ -43,7 +47,7 @@ public class Controller implements Initializable {
         } else {
             new Alert(Alert.AlertType.WARNING, warning, ButtonType.OK).showAndWait();
         }
-
+        textField.clear();
         textField.requestFocus();
     }
 
@@ -52,7 +56,7 @@ public class Controller implements Initializable {
     private String validate() {
         String textFromField = textField.getText();
         String warning = null;
-        if (textFromField.isEmpty()) {
+        if (textFromField.trim().length() == 0) {
             warning = "Нельзя отправлять пустое сообщение";
         } else {
             Integer count = uniqCheckMap.getOrDefault(textFromField, 0);
