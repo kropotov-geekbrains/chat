@@ -1,12 +1,20 @@
 package ru.gb.chat.client;
 
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -131,5 +139,15 @@ public class Controller implements Initializable {
         });
 
         NetworkService.setCallOnDisconnect(args -> setAuthenticated(false));
+    }
+
+    public void registration(ActionEvent actionEvent) throws IOException {
+        Parent root = FXMLLoader.load(getClass().getResource("registration.fxml"));
+        Stage regStage = new Stage();
+        regStage.setTitle("Registration");
+        regStage.setScene(new Scene(root, 400, 200));
+        regStage.initModality(Modality.APPLICATION_MODAL);
+        regStage.initOwner(((Node)actionEvent.getSource()).getScene().getWindow());
+        regStage.showAndWait();
     }
 }
