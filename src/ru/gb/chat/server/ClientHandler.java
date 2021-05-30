@@ -1,5 +1,7 @@
 package ru.gb.chat.server;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import ru.gb.chat.client.ClientChat;
 
 import java.io.DataInputStream;
@@ -30,6 +32,19 @@ public class ClientHandler {
                 try {
                     while (true) {
                         String msg = in.readUTF();
+                        if (msg.startsWith("/reg ")) {
+                            String[] token = msg.split("\\s");
+                            if (authService.findByLoginAndNickname(token[1], token[2], token[3]) == true) {
+                                new Alert(Alert.AlertType.WARNING, "никнейм или логин занят", ButtonType.OK).showAndWait();
+                            }
+                        }
+                        if (msg.startsWith("/del ")) {
+                            String[] token = msg.split("\\s");
+                            User user = authService.findByLoginAndPassword(token[1], token[2]);
+                            if (user != null) {
+                                ListAuthService.getInstance().remove(user);
+                            }
+                        }
                         if (msg.startsWith("/auth ")) {
                             String[] token = msg.split("\\s");
                             User user = authService.findByLoginAndPassword(token[1], token[2]);
@@ -53,6 +68,7 @@ public class ClientHandler {
                                 serverChat.privateMsg(this, token[1], token[2]);
 
                             }
+
                         } else {
                             serverChat.broadcastMsg(user.getNickname() + ": " + msg);
                         }

@@ -13,6 +13,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import ru.gb.chat.server.ListAuthService;
 
 import java.io.IOException;
 import java.net.URL;
@@ -43,6 +44,8 @@ public class Controller implements Initializable {
 
     @FXML
     ListView<String> clientsList;
+
+
 
     private String nickname;
     private boolean authenticated;
@@ -148,6 +151,9 @@ public class Controller implements Initializable {
         regStage.setScene(new Scene(root, 400, 200));
         regStage.initModality(Modality.APPLICATION_MODAL);
         regStage.initOwner(((Node)actionEvent.getSource()).getScene().getWindow());
-        regStage.showAndWait();
+        regStage.show();
+        regStage.setOnCloseRequest(event -> {
+            regStage.close();
+        });
     }
 }

@@ -40,13 +40,28 @@ public class ListAuthService implements AuthService, CrudService<User, Long> {
     }
 
     @Override
-    public User save(User object) {
-        return null;
+    public boolean findByLoginAndNickname(String login, String password, String nickname) {
+        for (User u : users)
+            if (u.getLogin().equals(login) || u.getNickname().equals(nickname)) {
+                return true;
+            } else {
+                System.out.println("reg");
+                save(new User(login, password, nickname));
+                return false;
+            }
+        return true;
     }
 
     @Override
-    public User remove(User object) {
-        return null;
+    public User save(User newUser) {
+        users.add(newUser);
+        return newUser;
+    }
+
+    @Override
+    public void remove(User object) {
+        users.remove(object);
+        System.out.println("del");
     }
 
     @Override

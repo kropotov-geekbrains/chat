@@ -85,6 +85,9 @@ public class NetworkService {
                     }
                     while (true) {
                         msg = in.readUTF();
+                        if (msg.equals("/del ")) {
+                            out.writeUTF(msg);
+                        }
                         if (msg.equals("/end")) {
                             break;
                         }
@@ -128,5 +131,16 @@ public class NetworkService {
             Platform.exit();
 //            sendMessage("/end");
         });
+    }
+
+    public static void sendReg(String login, String password, String nickname) {
+        try {
+            if (socket == null || socket.isClosed()) {
+                connect();
+            }
+            out.writeUTF("/reg " + login + " " + password + " " + nickname);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
