@@ -1,5 +1,8 @@
 package ru.gb.chat.server;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -13,9 +16,10 @@ public class ListAuthService implements AuthService, CrudService<User, Long> {
     private final CopyOnWriteArrayList<User> users = new CopyOnWriteArrayList<>();
 
     private ListAuthService() {
-        for (int i = 0; i <= 10; i++) {
-            users.add(new User("login" + i, "pass" + i, "nick" + i));
-        }
+//        for (int i = 0; i <= 10; i++) {
+//            users.add(new User("login" + i, "pass" + i, "nick" + i));
+//        }
+
     }
 
     public static ListAuthService getInstance() {
@@ -41,11 +45,24 @@ public class ListAuthService implements AuthService, CrudService<User, Long> {
 
     @Override
     public User save(User object) {
+        for (User u : users) {
+            if (u.getLogin().equals(object.getLogin())) {
+                Alert alert = new Alert(Alert.AlertType.WARNING, "Пльзователь с таким Логином уже существует", ButtonType.OK );
+                alert.show();
+                return u;
+            } else if (u.getNickname().equals(object.getNickname())) {
+                Alert alert = new Alert(Alert.AlertType.WARNING, "Пльзователь с таким Ником уже существует", ButtonType.OK );
+                alert.show();
+                return u;
+                }
+        }
+        users.add(object);
         return null;
     }
 
     @Override
     public User remove(User object) {
+        users.remove(object);
         return null;
     }
 

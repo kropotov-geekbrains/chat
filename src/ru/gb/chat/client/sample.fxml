@@ -8,8 +8,19 @@
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.text.Text?>
 <VBox alignment="center" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="ru.gb.chat.client.Controller">
+
+    <HBox fx:id="regPanel" spacing="5.0">
+        <TextField fx:id="loginRegField" promptText="Логин" HBox.hgrow="ALWAYS" />
+        <PasswordField HBox.hgrow="ALWAYS" fx:id="passRegField" promptText="Пароль"/>
+        <TextField HBox.hgrow="ALWAYS" fx:id="nicknameRegField" promptText="Nickname" onAction="#sendReg"/>
+        <Button HBox.hgrow="ALWAYS" text="Зарегистрироваться" onAction="#sendReg"/>
+        <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+        </padding>
+    </HBox>
 
     <HBox fx:id="authPanel" spacing="5.0">
         <TextField fx:id="loginField" promptText="Логин" HBox.hgrow="ALWAYS" />

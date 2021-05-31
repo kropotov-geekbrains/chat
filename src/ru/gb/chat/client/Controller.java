@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import ru.gb.chat.server.ListAuthService;
 
 import java.net.URL;
 import java.util.HashMap;
@@ -19,6 +20,15 @@ public class Controller implements Initializable {
     TextArea textArea;
     @FXML
     TextField textField;
+
+    @FXML
+    TextField loginRegField;
+
+    @FXML
+    TextField nicknameRegField;
+
+    @FXML
+    PasswordField passRegField;
 
     @FXML
     TextField loginField;
@@ -79,6 +89,13 @@ public class Controller implements Initializable {
             }
         });
         setCallbacks();
+    }
+
+    public void sendReg() {
+        NetworkService.sendReg(loginRegField.getText(), passRegField.getText(), nicknameRegField.getText());
+        loginRegField.clear();
+        passRegField.clear();
+        nicknameRegField.clear();
     }
 
     public void sendAuth() {
