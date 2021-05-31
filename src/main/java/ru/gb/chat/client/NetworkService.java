@@ -3,6 +3,7 @@ package ru.gb.chat.client;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import lombok.Setter;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -21,12 +22,12 @@ public class NetworkService {
     private static DataOutputStream out;
 
 
-    private static Callback callOnException;
-    private static Callback callOnMsgReceived;
-    private static Callback callOnAuthenticated;
-    private static Callback callOnDisconnect;
-    private static Callback callOnRegFailed;
-    private static Callback callOnAuthFailed;
+    @Setter private static Callback callOnException;
+    @Setter private static Callback callOnMsgReceived;
+    @Setter private static Callback callOnAuthenticated;
+    @Setter private static Callback callOnDisconnect;
+    @Setter private static Callback callOnRegFailed;
+    @Setter private static Callback callOnAuthFailed;
 
     private static Wait_Count waitTillActive;
     private static final int WAIT_TO_MS = 30000;
@@ -44,28 +45,6 @@ public class NetworkService {
             disconnect();
             waitTillActive.stopW();
         });
-    }
-
-    public static void setCallOnException(Callback callOnException) {
-        NetworkService.callOnException = callOnException;
-    }
-
-    public static void setCallOnMsgReceived(Callback callOnMsgReceived) {
-        NetworkService.callOnMsgReceived = callOnMsgReceived;
-    }
-
-    public static void setCallOnAuthenticated(Callback callOnAuthenticated) {
-        NetworkService.callOnAuthenticated = callOnAuthenticated;
-    }
-
-    public static void setCallOnDisconnect(Callback callOnDisconnect) {
-        NetworkService.callOnDisconnect = callOnDisconnect;
-    }
-    public static void setCallOnRegFailed(Callback callOnRegFailed){
-        NetworkService.callOnRegFailed = callOnRegFailed;
-    }
-    public static void setCallOnAuthFailed(Callback callOnAuthFailed){
-        NetworkService.callOnAuthFailed = callOnAuthFailed;
     }
 
     public static void sendAuth(String login, String password) {
