@@ -1,6 +1,7 @@
 package ru.gb.chat.server;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * Created by Artem Kropotov on 24.05.2021
@@ -14,6 +15,6 @@ public interface CrudService<T, ID> {
 
     T findById(ID id);
 
-    List<T> findAll();
+    List<T> findAll(Predicate<T> clause);
 
 }

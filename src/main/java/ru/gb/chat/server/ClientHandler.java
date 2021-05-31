@@ -6,6 +6,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Artem Kropotov on 17.05.2021
@@ -16,7 +18,7 @@ public class ClientHandler {
     private DataOutputStream out;
     private DataInputStream in;
     private ServerChat serverChat;
-    private AuthService authService = ListAuthService.getInstance();
+    private ListAuthService authService = ListAuthService.getInstance();
     private User user;
 
     public ClientHandler(Socket socket, ServerChat serverChat) {
@@ -25,7 +27,6 @@ public class ClientHandler {
             this.out = new DataOutputStream(socket.getOutputStream());
             this.in = new DataInputStream(socket.getInputStream());
             this.serverChat = serverChat;
-
             new Thread(() -> {
                 try {
                     while (true) {
@@ -38,6 +39,23 @@ public class ClientHandler {
                                 this.user = user;
                                 serverChat.subscribe(this);
                                 break;
+                            }
+                            if(user == null)
+                                sendMessage("/authfail ");
+                        }
+                        if (msg.startsWith("/reg ")){
+                            String[] token = msg.split("\\s");
+                            ArrayList<User> users = (ArrayList<User>) authService.findAll((u)->{
+                                if(u.getLogin().equals(token[1]))
+                                    return true;
+                                return false;
+                            });
+                            if(users != null){
+                                sendMessage("r_fail ");
+                            }
+                            else{
+                                User user = authService.save(new User(token[1],token[2],""));
+                                sendMessage("r_ok ");
                             }
                         }
                     }
@@ -52,6 +70,11 @@ public class ClientHandler {
                                 String[] token = msg.split("\\s", 3);
                                 serverChat.privateMsg(this, token[1], token[2]);
 
+                            }
+                            if(msg.equals("/del")){
+                                sendMessage("/end");
+                                authService.remove(user);
+                                break;
                             }
                         } else {
                             serverChat.broadcastMsg(user.getNickname() + ": " + msg);
