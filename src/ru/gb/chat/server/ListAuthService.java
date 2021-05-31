@@ -40,16 +40,15 @@ public class ListAuthService implements AuthService, CrudService<User, Long> {
     }
 
     @Override
-    public boolean findByLoginAndNickname(String login, String password, String nickname) {
+    public User findByLoginAndNickname(String login, String password, String nickname) {
         for (User u : users)
             if (u.getLogin().equals(login) || u.getNickname().equals(nickname)) {
-                return true;
+                return null;
             } else {
                 System.out.println("reg");
-                save(new User(login, password, nickname));
-                return false;
+                return save(new User(login, password, nickname));
             }
-        return true;
+        return null;
     }
 
     @Override
@@ -59,9 +58,8 @@ public class ListAuthService implements AuthService, CrudService<User, Long> {
     }
 
     @Override
-    public void remove(User object) {
-        users.remove(object);
-        System.out.println("del");
+    public void remove(User delUser) {
+        users.remove(delUser);
     }
 
     @Override

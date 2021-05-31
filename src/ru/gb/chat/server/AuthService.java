@@ -6,5 +6,5 @@ package ru.gb.chat.server;
 public interface AuthService {
     User findByLoginAndPassword(String login, String password);
 
-    boolean findByLoginAndNickname(String login, String password, String nickname);
+    User findByLoginAndNickname(String login, String password, String nickname);
 }

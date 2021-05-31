@@ -1,11 +1,14 @@
 package ru.gb.chat.client;
 
 import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Optional;
 
 /**
  * Created by Artem Kropotov on 17.05.2021
@@ -23,13 +26,16 @@ public class NetworkService {
     private static Callback callOnMsgReceived;
     private static Callback callOnAuthenticated;
     private static Callback callOnDisconnect;
+    private static Callback callOnRegistration;
 
     static {
-        Callback callback = (args) -> {};
+        Callback callback = (args) -> {
+        };
         callOnException = callback;
         callOnMsgReceived = callback;
         callOnAuthenticated = callback;
         callOnDisconnect = callback;
+        callOnRegistration = callback;
     }
 
     public static void setCallOnException(Callback callOnException) {
@@ -46,6 +52,10 @@ public class NetworkService {
 
     public static void setCallOnDisconnect(Callback callOnDisconnect) {
         NetworkService.callOnDisconnect = callOnDisconnect;
+    }
+
+    public static void setCallOnRegistration(Callback callOnDisconnect) {
+        NetworkService.callOnRegistration = callOnRegistration;
     }
 
     public static void sendAuth(String login, String password) {
@@ -78,6 +88,12 @@ public class NetworkService {
                     String msg;
                     while (true) {
                         msg = in.readUTF();
+                        if (msg.startsWith("/regok ")) {
+                            //todo callback reg
+                            System.out.println("Пользователь зарегистрирован");
+                        }
+                        if (msg.startsWith("/regfail "))
+                            System.out.println("ошибка регистрации");
                         if (msg.startsWith("/authok ")) {
                             callOnAuthenticated.callback(msg.split("\\s")[1]);
                             break;
@@ -93,7 +109,7 @@ public class NetworkService {
                         }
                         callOnMsgReceived.callback(msg);
                     }
-                } catch(IOException e) {
+                } catch (IOException e) {
                     callOnException.callback("Соединение с сервером разорвано");
                     e.printStackTrace();
                 } finally {
@@ -127,7 +143,7 @@ public class NetworkService {
     }
 
     public static void close() {
-        Platform.runLater( () -> {
+        Platform.runLater(() -> {
             Platform.exit();
 //            sendMessage("/end");
         });
