@@ -1,6 +1,7 @@
 package ru.gb.chat.server;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -41,11 +42,14 @@ public class ListAuthService implements AuthService, CrudService<User, Long> {
 
     @Override
     public User save(User object) {
+        users.add(object);
+        System.out.println("Создали пользователя: " +String.valueOf(object));
         return null;
     }
 
     @Override
     public User remove(User object) {
+        users.remove(object);
         return null;
     }
 

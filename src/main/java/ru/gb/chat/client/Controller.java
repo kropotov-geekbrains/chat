@@ -1,15 +1,17 @@
 package ru.gb.chat.client;
 
 import javafx.application.Platform;
+import javafx.concurrent.ScheduledService;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
+import javafx.util.Duration;
 
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class Controller implements Initializable {
 
@@ -35,11 +37,25 @@ public class Controller implements Initializable {
     private String nickname;
     private boolean authenticated;
 
+    private IdleService idleService;
+
     public void sendMsg(){
         String warning = validate();
         if (warning == null) {
-            NetworkService.sendMessage(textField.getText());
+            String text = textField.getText();
+            if (text.equals("/end")) {
+                Platform.runLater(() -> {
+                    idleService.cancel();
+                });
+            }
+            else {
+                Platform.runLater(() -> {
+                    idleService.restart();
+                });
+            }
+            NetworkService.sendMessage(text);
             textField.clear();
+
         } else {
             new Alert(Alert.AlertType.WARNING, warning, ButtonType.OK).showAndWait();
         }
@@ -69,6 +85,10 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        idleService = new IdleService();
+        idleService.setPeriod(Duration.seconds(20));
+        idleService.setDelay(Duration.seconds(20));
+
         setAuthenticated(false);
         clientsList.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
@@ -78,7 +98,9 @@ public class Controller implements Initializable {
                 textField.selectEnd();
             }
         });
+
         setCallbacks();
+
     }
 
     public void sendAuth() {
@@ -97,6 +119,15 @@ public class Controller implements Initializable {
         clientsList.setManaged(authenticated);
         if (!authenticated) {
             nickname = "";
+            Platform.runLater(() -> {
+                idleService.cancel();
+            });
+
+        }
+        else {
+            Platform.runLater(() -> {
+                idleService.restart();
+            });
         }
 
     }
@@ -104,9 +135,35 @@ public class Controller implements Initializable {
     public void setCallbacks() {
         NetworkService.setCallOnException(args -> new Alert(Alert.AlertType.WARNING, String.valueOf(args[0]), ButtonType.OK).showAndWait());
 
+        NetworkService.setCallOnWrongAuthenticated(args -> {
+                Platform.runLater(() -> {
+                    new Alert(Alert.AlertType.WARNING, String.valueOf(args[0]), ButtonType.OK).showAndWait();
+                });
+        });
+
+        NetworkService.setCallOnDoCreateAccount(args -> {
+            Platform.runLater(() -> {
+
+                String message = String.valueOf(args[0]);
+
+                String [] tokens = message.split ("\"");
+
+                Alert alert =  new Alert(Alert.AlertType.CONFIRMATION, message, ButtonType.YES, ButtonType.CANCEL);
+                alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+                Optional<ButtonType> result =alert.showAndWait();
+
+                if (result.orElse(ButtonType.CANCEL) == ButtonType.YES) {
+                    System.out.println("Создаем аккаунт");
+                    createAccount(tokens[1],tokens[3], tokens[1]);
+                }
+            });
+        });
+
+
         NetworkService.setCallOnAuthenticated(args -> {
             nickname = String.valueOf(args[0]);
             setAuthenticated(true);
+
         });
 
         NetworkService.setCallOnMsgReceived(args -> {
@@ -127,5 +184,32 @@ public class Controller implements Initializable {
         });
 
         NetworkService.setCallOnDisconnect(args -> setAuthenticated(false));
+    }
+    public void deleteAccount(){
+      textField.setText("/delacc");
+      sendMsg();
+    }
+
+    public void createAccount(String login, String password, String nicname){
+        textField.setText("/createacc "+login+ " "+password+ " "+nicname);
+        sendMsg();
+    }
+
+
+    private class IdleService extends ScheduledService<Void> {
+
+        @Override
+        protected Task<Void> createTask() {
+            return new Task<>() {
+
+                @Override
+                protected Void call() throws Exception {
+                    System.out.println("Idle");
+                    textField.setText("/end");
+                    sendMsg();
+                    return null;
+                }
+            };
+        }
     }
 }
