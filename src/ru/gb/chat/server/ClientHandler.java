@@ -1,6 +1,10 @@
 package ru.gb.chat.server;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import ru.gb.chat.client.Callback;
 import ru.gb.chat.client.ClientChat;
+import ru.gb.chat.client.NetworkService;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -30,6 +34,24 @@ public class ClientHandler {
                 try {
                     while (true) {
                         String msg = in.readUTF();
+                        if (msg.startsWith("/reg ")) {
+                            String[] token = msg.split("\\s");
+                            if (authService.findByLoginAndNickname(token[1], token[2], token[3]) == null) {
+                                sendMessage("/regfail ");
+                            } else {
+                                sendMessage("/regok ");
+                            }
+                        }
+                        if (msg.startsWith("/del ")) {
+                            String[] token = msg.split("\\s");
+                            User user = authService.findByLoginAndPassword(token[1], token[2]);
+                            if (user != null) {
+                                ListAuthService.getInstance().remove(user);
+                            } else {
+                                //todo delete callback
+                                System.out.println("Ошибка удаления. Пользователь не найден");
+                            }
+                        }
                         if (msg.startsWith("/auth ")) {
                             String[] token = msg.split("\\s");
                             User user = authService.findByLoginAndPassword(token[1], token[2]);
@@ -53,6 +75,7 @@ public class ClientHandler {
                                 serverChat.privateMsg(this, token[1], token[2]);
 
                             }
+
                         } else {
                             serverChat.broadcastMsg(user.getNickname() + ": " + msg);
                         }

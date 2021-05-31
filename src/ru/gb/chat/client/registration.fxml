@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="center" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.gb.chat.client.regController">
+   <children>
+      <VBox prefHeight="216.0" prefWidth="459.0">
+         <children>
+            <TextField fx:id="regLogin" promptText="Введите логин">
+               <VBox.margin>
+                  <Insets left="5.0" right="5.0" top="5.0" />
+               </VBox.margin></TextField>
+            <Label text="Логин">
+               <VBox.margin>
+                  <Insets left="5.0" />
+               </VBox.margin>
+               <padding>
+                  <Insets bottom="5.0" />
+               </padding></Label>
+             <TextField fx:id="regPassword" promptText="Введите пароль">
+               <VBox.margin>
+                  <Insets left="5.0" right="5.0" top="5.0" />
+               </VBox.margin></TextField>
+             <Label text="Пароль">
+               <VBox.margin>
+                  <Insets left="5.0" />
+               </VBox.margin>
+               <padding>
+                  <Insets bottom="5.0" />
+               </padding></Label>
+             <TextField fx:id="regNickname" promptText="Введите никнейм">
+               <VBox.margin>
+                  <Insets left="5.0" right="5.0" top="5.0" />
+               </VBox.margin></TextField>
+             <Label text="Никнейм">
+               <VBox.margin>
+                  <Insets left="5.0" />
+               </VBox.margin>
+               <padding>
+                  <Insets bottom="5.0" />
+               </padding></Label>
+         </children>
+      </VBox>
+      <Button mnemonicParsing="false" onAction="#registration" prefHeight="25.0" prefWidth="462.0" text="Зарегистрироваться">
+         <VBox.margin>
+            <Insets bottom="2.0" left="2.0" right="2.0" />
+         </VBox.margin></Button>
+   </children>
+</VBox>

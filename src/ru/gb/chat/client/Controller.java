@@ -1,11 +1,21 @@
 package ru.gb.chat.client;
 
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import ru.gb.chat.server.ListAuthService;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,10 +37,15 @@ public class Controller implements Initializable {
     PasswordField passField;
 
     @FXML
-    HBox authPanel, msgPanel;
+    HBox msgPanel;
+
+    @FXML
+    VBox authPanel;
 
     @FXML
     ListView<String> clientsList;
+
+
 
     private String nickname;
     private boolean authenticated;
@@ -43,7 +58,7 @@ public class Controller implements Initializable {
         } else {
             new Alert(Alert.AlertType.WARNING, warning, ButtonType.OK).showAndWait();
         }
-
+        textField.clear();
         textField.requestFocus();
     }
 
@@ -52,7 +67,7 @@ public class Controller implements Initializable {
     private String validate() {
         String textFromField = textField.getText();
         String warning = null;
-        if (textFromField.isEmpty()) {
+        if (textFromField.trim().length() == 0) {
             warning = "Нельзя отправлять пустое сообщение";
         } else {
             Integer count = uniqCheckMap.getOrDefault(textFromField, 0);
@@ -127,5 +142,18 @@ public class Controller implements Initializable {
         });
 
         NetworkService.setCallOnDisconnect(args -> setAuthenticated(false));
+    }
+
+    public void registration(ActionEvent actionEvent) throws IOException {
+        Parent root = FXMLLoader.load(getClass().getResource("registration.fxml"));
+        Stage regStage = new Stage();
+        regStage.setTitle("Registration");
+        regStage.setScene(new Scene(root, 400, 200));
+        regStage.initModality(Modality.APPLICATION_MODAL);
+        regStage.initOwner(((Node)actionEvent.getSource()).getScene().getWindow());
+        regStage.show();
+        regStage.setOnCloseRequest(event -> {
+            regStage.close();
+        });
     }
 }
