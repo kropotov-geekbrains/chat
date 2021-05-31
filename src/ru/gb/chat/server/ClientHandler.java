@@ -30,6 +30,38 @@ public class ClientHandler {
                 try {
                     while (true) {
                         String msg = in.readUTF();
+
+                        if(msg.startsWith("/del ")) {
+                            String[] token = msg.split("\\s");
+                            serverChat.unsubscribe(this);
+                            User user = authService.remove(new User(token[1], token[2], token[3]));
+                            if (user == null) {
+                                sendMessage("/del ");
+                                this.user = null;
+                                break;
+                            }
+                            if (user != null) {
+                                break;
+                            }
+                        }
+
+                        if(msg.startsWith("/registration ")) {
+                            String[] token = msg.split("\\s");
+                            User user = authService.save(new User(token[1], token[2], token[3]));
+                            if (user != null) {
+                                sendMessage("/registration " + user.getNickname());
+                                this.user = user;
+                                serverChat.subscribe(this);
+                                break;
+                            }
+                            // Послыаем сообщение об отсутствии регистрации
+                            if (user == null) {
+                                // Пока authnot
+                                sendMessage("/authnot");
+                                break;
+                            }
+                        }
+
                         if (msg.startsWith("/auth ")) {
                             String[] token = msg.split("\\s");
                             User user = authService.findByLoginAndPassword(token[1], token[2]);
@@ -37,6 +69,16 @@ public class ClientHandler {
                                 sendMessage("/authok " + user.getNickname());
                                 this.user = user;
                                 serverChat.subscribe(this);
+                                break;
+                            }
+                            // Послыаем сообщение о неудачном выборе ника
+                            if (user != null && serverChat.isNickBusy(user.getNickname())) {
+                                sendMessage("/authfail");
+                                break;
+                            }
+                            // Послыаем сообщение об отсутствии регистрации
+                            if (user == null) {
+                                sendMessage("/authnot");
                                 break;
                             }
                         }
