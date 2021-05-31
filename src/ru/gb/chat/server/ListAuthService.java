@@ -40,13 +40,31 @@ public class ListAuthService implements AuthService, CrudService<User, Long> {
     }
 
     @Override
+    // todo объявил в CrudService, понять и простить))))
     public User save(User object) {
+
+        for (User u : users) {
+            if (!u.getLogin().equals(object.getLogin()) && !u.getPassword().equals(object.getPassword()) && !u.getNickname().equals(object.getNickname())) {
+                users.add(object);
+                return object;
+            }
+        }
         return null;
     }
 
     @Override
+    // todo объявил в CrudService, понять и простить)))) Не удаляет(((
     public User remove(User object) {
-        return null;
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i).getLogin().equals(object.getLogin()) &&
+                    users.get(i).getPassword().equals(object.getPassword()) &&
+                    users.get(i).getNickname().equals(object.getNickname()))
+            {
+                users.remove(object);
+                return null;
+            }
+        }
+        return object;
     }
 
     @Override

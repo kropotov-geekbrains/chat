@@ -27,7 +27,10 @@ public class Controller implements Initializable {
     PasswordField passField;
 
     @FXML
-    HBox authPanel, msgPanel;
+    TextField nicknameField;
+
+    @FXML
+    HBox authPanel, msgPanel,regPanel,imgPanel;
 
     @FXML
     ListView<String> clientsList;
@@ -81,16 +84,47 @@ public class Controller implements Initializable {
         setCallbacks();
     }
 
+    public void sendReg() {
+        if(loginField.getText().equals("") || passField.getText().equals("") || nicknameField.getText().equals("")) {
+            new Alert(Alert.AlertType.WARNING, "Вы ввели не все данные", ButtonType.OK).showAndWait();
+        } else {
+            NetworkService.sendReg(loginField.getText(), passField.getText(), nicknameField.getText());
+            loginField.clear();
+            passField.clear();
+            nicknameField.clear();
+        }
+    }
+
+    public void sendDelReg() {
+        if(loginField.getText().equals("") || passField.getText().equals("") || nicknameField.getText().equals("")) {
+            new Alert(Alert.AlertType.WARNING, "Для удаления введите все данные", ButtonType.OK).showAndWait();
+        } else {
+            NetworkService.sendDelReg(loginField.getText(), passField.getText(), nicknameField.getText());
+            loginField.clear();
+            passField.clear();
+            nicknameField.clear();
+        }
+    }
+
     public void sendAuth() {
-        NetworkService.sendAuth(loginField.getText(), passField.getText());
-        loginField.clear();
-        passField.clear();
+        if(loginField.getText().equals("")|| passField.getText().equals("")) {
+            new Alert(Alert.AlertType.WARNING, "Вы ввели не все данные", ButtonType.OK).showAndWait();
+        } else {
+            NetworkService.sendAuth(loginField.getText(), passField.getText());
+            loginField.clear();
+            passField.clear();
+        }
     }
 
     public void setAuthenticated(boolean authenticated) {
         this.authenticated = authenticated;
+        regPanel.setVisible(!authenticated);
+        regPanel.setManaged(!authenticated);
+        imgPanel.setVisible(!authenticated);
+        imgPanel.setManaged(!authenticated);
         authPanel.setVisible(!authenticated);
         authPanel.setManaged(!authenticated);
+
         msgPanel.setVisible(authenticated);
         msgPanel.setManaged(authenticated);
         clientsList.setVisible(authenticated);
