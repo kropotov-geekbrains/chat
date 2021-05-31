@@ -17,6 +17,7 @@ public class ClientHandler {
     private DataInputStream in;
     private ServerChat serverChat;
     private AuthService authService = ListAuthService.getInstance();
+    private CrudService crudService = ListAuthService.getInstance();
     private User user;
 
     public ClientHandler(Socket socket, ServerChat serverChat) {
@@ -28,6 +29,20 @@ public class ClientHandler {
 
             new Thread(() -> {
                 try {
+                    while (true) {
+                        String msg = in.readUTF();
+                        if (msg.startsWith("/reg ")) {
+                            String[] token = msg.split("\\s");
+                            User user = (User) crudService.save(new User(token[1], token[2], token[3]));
+                            if (user != null && !serverChat.isNickBusy(user.getNickname())) {
+                                sendMessage("/regok " + user.getNickname());
+                                this.user = user;
+                                serverChat.subscribe(this);
+                                break;
+                            }
+                        }
+                    }
+
                     while (true) {
                         String msg = in.readUTF();
                         if (msg.startsWith("/auth ")) {

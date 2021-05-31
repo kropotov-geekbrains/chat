@@ -48,6 +48,18 @@ public class NetworkService {
         NetworkService.callOnDisconnect = callOnDisconnect;
     }
 
+
+    public static void sendReg(String login, String password, String nickname) {
+        try {
+            if (socket == null || socket.isClosed()) {
+                connect();
+            }
+            out.writeUTF("/reg " + login + " " + password + " " + nickname);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void sendAuth(String login, String password) {
         try {
             if (socket == null || socket.isClosed()) {
