@@ -1,6 +1,7 @@
 package ru.gb.chat.server;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * Created by Artem Kropotov on 24.05.2021
@@ -32,7 +33,7 @@ public class DBAuthService  implements AuthService, CrudService<User, Long>  {
     }
 
     @Override
-    public List<User> findAll() {
+    public List<User> findAll(Predicate<User> clause) {
         return null;
     }
 }

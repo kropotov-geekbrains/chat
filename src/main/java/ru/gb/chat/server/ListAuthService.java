@@ -1,7 +1,9 @@
 package ru.gb.chat.server;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Predicate;
 
 /**
  * Created by Artem Kropotov on 24.05.2021
@@ -41,16 +43,27 @@ public class ListAuthService implements AuthService, CrudService<User, Long> {
 
     @Override
     public User save(User object) {
-        return null;
+        User user = new User(object.getLogin(), object.getPassword(), "nick"+users.size());
+        users.add(user);
+        return user;
     }
 
     @Override
     public User remove(User object) {
-        return null;
+        User user = findByLoginAndPassword(object.getLogin(), object.getPassword());
+        users.remove(user);
+        return user;
     }
 
     @Override
-    public List<User> findAll() {
+    public List<User> findAll(Predicate<User> clause) {
+        ArrayList<User> userList = new ArrayList<>();
+        for(User u : users){
+            if(clause.test(u))
+                userList.add(u);
+        }
+        if(!userList.isEmpty())
+            return userList;
         return null;
     }
 

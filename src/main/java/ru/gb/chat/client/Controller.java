@@ -86,7 +86,11 @@ public class Controller implements Initializable {
         loginField.clear();
         passField.clear();
     }
-
+    public void sendReg(){
+        NetworkService.sendReg(loginField.getText(), passField.getText());
+        loginField.clear();
+        passField.clear();
+    }
     public void setAuthenticated(boolean authenticated) {
         this.authenticated = authenticated;
         authPanel.setVisible(!authenticated);
@@ -127,5 +131,12 @@ public class Controller implements Initializable {
         });
 
         NetworkService.setCallOnDisconnect(args -> setAuthenticated(false));
+
+        NetworkService.setCallOnRegFailed(args -> {
+            Platform.runLater(()->{new Alert(Alert.AlertType.WARNING, "Неуникальный логин", ButtonType.OK).showAndWait();});
+        });
+        NetworkService.setCallOnAuthFailed(args -> {
+            Platform.runLater(()->{new Alert(Alert.AlertType.WARNING, "Неправильный логин/пароль", ButtonType.OK).showAndWait();});
+        });
     }
 }
