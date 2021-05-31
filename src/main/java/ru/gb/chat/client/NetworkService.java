@@ -22,13 +22,19 @@ public class NetworkService {
     private static Callback callOnException;
     private static Callback callOnMsgReceived;
     private static Callback callOnAuthenticated;
+    private static Callback callOnWrongAuthentication;
+    private static Callback callOnDoCreateAccount;
     private static Callback callOnDisconnect;
+
+
 
     static {
         Callback callback = (args) -> {};
         callOnException = callback;
         callOnMsgReceived = callback;
         callOnAuthenticated = callback;
+        callOnWrongAuthentication = callback;
+        callOnDoCreateAccount = callback;
         callOnDisconnect = callback;
     }
 
@@ -42,6 +48,14 @@ public class NetworkService {
 
     public static void setCallOnAuthenticated(Callback callOnAuthenticated) {
         NetworkService.callOnAuthenticated = callOnAuthenticated;
+    }
+
+    public static void setCallOnWrongAuthenticated(Callback callOnWrongAuthentication) {
+        NetworkService.callOnWrongAuthentication = callOnWrongAuthentication;
+    }
+
+    public static void setCallOnDoCreateAccount(Callback callOnDoCreateAccount) {
+        NetworkService.callOnDoCreateAccount = callOnDoCreateAccount;
     }
 
     public static void setCallOnDisconnect(Callback callOnDisconnect) {
@@ -62,6 +76,7 @@ public class NetworkService {
     public static void sendMessage(String message) {
         try {
             out.writeUTF(message);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -82,6 +97,14 @@ public class NetworkService {
                             callOnAuthenticated.callback(msg.split("\\s")[1]);
                             break;
                         }
+                        else if (msg.startsWith("/authwrong ")) {
+                            callOnDoCreateAccount.callback(msg.replace("/authwrong ",""));
+
+                        }
+                        else if (msg.startsWith("/authexists ")) {
+                            callOnWrongAuthentication.callback(msg.replace("/authexists ",""));
+
+                        }
                     }
                     while (true) {
                         msg = in.readUTF();
@@ -91,8 +114,9 @@ public class NetworkService {
                         callOnMsgReceived.callback(msg);
                     }
                 } catch(IOException e) {
-                    callOnException.callback("Соединение с сервером разорвано");
                     e.printStackTrace();
+                    callOnException.callback("Соединение с сервером разорвано");
+
                 } finally {
                     disconnect();
                 }
@@ -129,4 +153,7 @@ public class NetworkService {
             sendMessage("/end");
         });
     }
+
+
+
 }

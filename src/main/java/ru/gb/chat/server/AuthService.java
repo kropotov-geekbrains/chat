@@ -5,4 +5,7 @@ package ru.gb.chat.server;
  */
 public interface AuthService {
     User findByLoginAndPassword(String login, String password);
+    User remove(User user);
+    User save(User user);
+
 }

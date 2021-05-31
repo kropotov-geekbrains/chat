@@ -39,6 +39,27 @@ public class ClientHandler {
                                 serverChat.subscribe(this);
                                 break;
                             }
+                            else {
+                                if (user==null) {
+                                    sendMessage("/authwrong " + "Неверный логин или пароль"+"\""+token[1]+"\" \""+token[2]+"\". Создать пользователя?");
+                                }
+                                else {
+                                    sendMessage("/authexists " + "Пользователь "+"\""+token[1]+"\" уже подключен");
+                                }
+                            }
+                        }
+                        else if (msg.startsWith("/createacc ")) {
+                            String[] token = msg.split("\\s");
+                            User user = new User(token[1], token[2], token[3]);
+
+                            authService.save(user);
+                            sendMessage("/authok " + user.getNickname());
+                            this.user = user;
+
+                            serverChat.subscribe(this);
+                            break;
+
+
                         }
                     }
                     while (true) {
@@ -48,10 +69,15 @@ public class ClientHandler {
                                 sendMessage("/end");
                                 break;
                             }
-                            if (msg.startsWith("/w")) {
+                           if (msg.startsWith("/w")) {
                                 String[] token = msg.split("\\s", 3);
                                 serverChat.privateMsg(this, token[1], token[2]);
 
+                            }
+                            if (msg.startsWith("/delacc")) {
+                                sendMessage("/end");
+                                authService.remove(getUser());
+                                break;
                             }
                         } else {
                             serverChat.broadcastMsg(user.getNickname() + ": " + msg);
