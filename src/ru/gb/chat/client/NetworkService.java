@@ -1,7 +1,6 @@
 package ru.gb.chat.client;
 
 import javafx.application.Platform;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -71,7 +70,6 @@ public class NetworkService {
             in = new DataInputStream(socket.getInputStream());
             Thread clientListener = new Thread(() -> {
                 try {
-                    // цикл успешной аутентификации
                     String msg;
                     while (true) {
                         msg = in.readUTF();
