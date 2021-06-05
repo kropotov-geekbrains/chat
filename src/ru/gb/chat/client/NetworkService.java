@@ -1,5 +1,4 @@
 package ru.gb.chat.client;
-
 import javafx.application.Platform;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
