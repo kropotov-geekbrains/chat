@@ -1,7 +1,5 @@
 package ru.gb.chat.server;
 
-import ru.gb.chat.client.ClientChat;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -41,6 +39,7 @@ public class ClientHandler {
                             }
                         }
                     }
+                    //Закртыие сокета и вызов удаления клиента из списка
                     while (true) {
                         String msg = in.readUTF();
                         if (msg.startsWith("/")) {
