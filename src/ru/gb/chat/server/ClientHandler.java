@@ -5,29 +5,56 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
-/**
- * Created by Artem Kropotov on 17.05.2021
- */
 public class ClientHandler {
-
     private Socket socket;
     private DataOutputStream out;
     private DataInputStream in;
     private ServerChat serverChat;
     private AuthService authService = ListAuthService.getInstance();
     private User user;
-
+    
     public ClientHandler(Socket socket, ServerChat serverChat) {
         try {
             this.socket = socket;
             this.out = new DataOutputStream(socket.getOutputStream());
             this.in = new DataInputStream(socket.getInputStream());
             this.serverChat = serverChat;
-
             new Thread(() -> {
                 try {
                     while (true) {
                         String msg = in.readUTF();
+                        
+                        if (msg.startsWith("/del ")) {
+                            String[] token = msg.split("\\s");
+                            serverChat.unsubscribe(this);
+                            User user = authService.remove(new User(token[1], token[2], token[3]));
+                            if (user == null) {
+                                sendMessage("/del ");
+                                this.user = null;
+                                break;
+                            }
+                            if (user != null) {
+                                break;
+                            }
+                        }
+                        
+                        if (msg.startsWith("/registration ")) {
+                            String[] token = msg.split("\\s");
+                            User user = authService.save(new User(token[1], token[2], token[3]));
+                            if (user != null) {
+                                sendMessage("/registration " + user.getNickname());
+                                this.user = user;
+                                serverChat.subscribe(this);
+                                break;
+                            }
+                            
+                            if (user == null) {
+                                
+                                sendMessage("/authnot");
+                                break;
+                            }
+                        }
+                        
                         if (msg.startsWith("/auth ")) {
                             String[] token = msg.split("\\s");
                             User user = authService.findByLoginAndPassword(token[1], token[2]);
@@ -37,9 +64,18 @@ public class ClientHandler {
                                 serverChat.subscribe(this);
                                 break;
                             }
+                            
+                            if (user != null && serverChat.isNickBusy(user.getNickname())) {
+                                sendMessage("/authfail");
+                                break;
+                            }
+                            
+                            if (user == null) {
+                                sendMessage("/authnot");
+                                break;
+                            }
                         }
                     }
-                    //Закртыие сокета и вызов удаления клиента из списка
                     while (true) {
                         String msg = in.readUTF();
                         if (msg.startsWith("/")) {
@@ -50,7 +86,6 @@ public class ClientHandler {
                             if (msg.startsWith("/w")) {
                                 String[] token = msg.split("\\s", 3);
                                 serverChat.privateMsg(this, token[1], token[2]);
-
                             }
                         } else {
                             serverChat.broadcastMsg(user.getNickname() + ": " + msg);
@@ -68,7 +103,7 @@ public class ClientHandler {
             e.printStackTrace();
         }
     }
-
+    
     public void sendMessage(String message) {
         try {
             out.writeUTF(message);
@@ -76,7 +111,7 @@ public class ClientHandler {
             e.printStackTrace();
         }
     }
-
+    
     public void disconnect() {
         serverChat.unsubscribe(this);
         try {
@@ -95,7 +130,7 @@ public class ClientHandler {
             e.printStackTrace();
         }
     }
-
+    
     public User getUser() {
         return user;
     }

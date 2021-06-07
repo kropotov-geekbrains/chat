@@ -1,11 +1,12 @@
 package ru.gb.chat.server;
 
-import java.io.*;
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ServerChat {
+    
     private final CopyOnWriteArrayList<ClientHandler> clients = new CopyOnWriteArrayList<>();
     
     public static void main(String[] args) {
